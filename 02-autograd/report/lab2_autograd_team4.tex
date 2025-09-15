@@ -50,10 +50,16 @@ We describe the local gradients of some operators below.
 \end{equation}
 \begin{equation}
   \texttt{ReLU}(x) = \max(x, 0),
-  \quad \pdv{\texttt{ReLU}}{x} = yx^{y-1},
+  % TODO - END
+  \quad \pdv{\texttt{ReLU}}{x} =
+  \begin{cases}
+    1, & x > 0 \\
+    0, & x \leq 0
+  \end{cases},
 \end{equation}
 \begin{equation}
   \texttt{Sum}(x, \texttt{axis}) = \sum_{i \in \texttt{axis}} x_i,
+  % TODO - any other way to represent this better? matrix whose every elem is 1?
   \quad \pdv{\texttt{Sum}}{x} = 1,
 \end{equation}
 \begin{equation}
@@ -71,24 +77,95 @@ Following \cite{accurate-softmax}, we use a shifted softmax for numerical stabil
 
 The negative log-likelihood loss (with log-probability input)
 \[
-  \texttt{NLLLoss}(\log\hat{y}, y) = -y \log \hat{y}
+  % \texttt{NLLLoss}(\log\hat{y}, y) = -y \log \hat{y}
+  \texttt{NLLLoss}(\log\hat{y}, y) = \sum_i -y_i \log \hat{y}_i
 \]
 
 The cross-entropy loss (with logit inputs) can be seen as a combination of \texttt{Softmax} and \texttt{NLLLoss}.
+\[
+  \texttt{CrossEntropyLoss}(x, y) = \texttt{NLLLoss}(\log (\texttt{Softmax}(x)), y) = \sum_i -y_i \log \texttt{Softmax}(x_i)
+\]
 
-
+% TODO - need to expand? i tried, but it looks too messy
 
 \subsection{Matrix Multiplication}
 
+Consider \(y=xw\) for \(w \in \mathbb{R}^{D \times M}\), \(x \in \mathbb{R}^{N \times D}\), and \(y \in \mathbb{R}^{N \times M}\).
+Then, each element of \(y\) is computed as
+\[
+  y_{n,m} = \sum_d x_{n,d} w_{d,m}.
+\]
+In matrix form,
+\[
+  \begin{bmatrix}
+    y_{1,1} & \cdots & y_{1,M} \\
+    \vdots  & \ddots  & \vdots \\
+    y_{N,1} & \cdots & y_{N,M}
+  \end{bmatrix} 
+    = 
+  \begin{bmatrix}
+    x_{1,1} & \cdots & x_{1,D} \\
+    \vdots  & \ddots  & \vdots \\
+    x_{N,1} & \cdots & x_{N,D}
+  \end{bmatrix}
+  \begin{bmatrix}
+    w_{1,1} & \cdots & w_{1,M} \\
+    \vdots  & \ddots  & \vdots \\
+    w_{D,1} & \cdots & w_{D,M}
+  \end{bmatrix}
+\]
+
+Suppose \(\frac{\partial \mathcal{L} }{\partial y}\) is given as
+
+\[
+  \begin{bmatrix}
+    \frac{\partial \mathcal{L} }{\partial y_{1,1}} & \cdots & \frac{\partial \mathcal{L} }{\partial y_{1,M}} \\
+    \vdots  & \ddots  & \vdots \\
+    \frac{\partial \mathcal{L} }{\partial y_{N,1}} & \cdots & \frac{\partial \mathcal{L} }{\partial y_{N,M}}
+  \end{bmatrix}
+\]
+
+Considering any element of \(x\), \(x_{i,j}\), it only contributes to all \(y_{n:}\) as
+\[
+  y_{i:} = 
+  \begin{bmatrix}
+       \sum_d x_{i,d} w_{d,0}. & \cdots & \sum_d x_{i,d} w_{d,M}
+  \end{bmatrix}
+\]
+
+This leads to \(\frac{\partial \mathcal{L}}{\partial x}\) as
+
+\[
+  \frac{\partial \mathcal{L}}{\partial x_{n,d}} = 
+  \sum_m \frac{\partial \mathcal{L} }{\partial y_{n,m}} \frac{\partial y_{n,m}}{\partial x_{n,d}} = 
+  \sum_m \frac{\partial \mathcal{L} }{\partial y_{n,m}} w_{d,m} =
+  \frac{\partial \mathcal{L} }{\partial y_{n:}} (w_{d:})^{\top}
+\]
+
+Consequensly, we can get \(\frac{\partial \mathcal{L}}{\partial x} = \frac{\partial \mathcal{L} }{\partial y} w^{\top}\).
+Similarly, we can get \(\frac{\partial \mathcal{L}}{\partial w} = x^{\top} \frac{\partial \mathcal{L} }{\partial y}\).
 
 \subsection{Cross Entropy Loss}
 
-
+% TODO - Expand here? 
 
 \section{MNIST Classification}
 
 Utilizing the operators described in \autoref{sec:autodiff},
 we perform testing on the MNIST dataset.
+We use a 3-Layer MLP as shown below.
+
+% TODO - include a abstract image of mlp or a few lines of description about the model
+% How about the MLP code?
+
+The model was trained for 10 epochs with a batch size of 100 and a learning rate of 0.1.
+The result is shown in figure below.
+
+% TODO - include the result image, acc and loss
+
+Consequently, the model achieved an accuracy of {acc}, confirming the correctness of its implementation.
+
+% TODO - Conclusion here? or elsewhere?
 
 
 \printbibliography
