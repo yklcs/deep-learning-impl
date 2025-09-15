@@ -1,0 +1,96 @@
+\documentclass{lucas-report}
+
+\title{CSED490F Lab: Autograd}
+\author{Team 4: Yunkyu Lee (20210733), Hyeonu Cho (20230740)}
+\date{September 14, 2025}
+
+\addbibresource{lab2_autograd_team4.bib}
+
+\begin{document}
+\maketitle
+
+\section{Automatic Differentiation}\label{sec:autodiff}
+
+Reverse-mode automatic differentiation performs
+back-to-front accumulation of local gradients based on the chain rule.
+Consider a function $f : \mathbb{R}^{n} \mapsto \mathbb{R}^m$,
+and its $m \times n$ Jacobian $\vb{J}_f$.
+For $\vb{y} = f(\vb{x})$, suppose we know $\grad_{\vb{y}}\mathcal{L}$,
+the gradient of some scalar value $\mathcal{L}$ w.r.t. $\vb{y}$.
+Then, we can obtain $\grad_{\vb{x}}\mathcal{L}$ as a vector-Jacobian product (VJP):
+\[
+  \grad_{\vb{x}}\mathcal{L} = (\grad_{\vb{y}}\mathcal{L})^\top \vb{J}_f
+\]
+As $\vb{J}_{f_1 \circ f_2} = \vb{J}_{f_1} \circ \vb{J}_{f_2}$,
+we can chain the above VJP in order to obtain gradients of composed functions.
+Ttherefore, knowing the local gradients of function outputs w.r.t. their inputs
+is sufficient for reverse-mode automatic differentiation.
+We describe the local gradients of some operators below.
+
+\subsection{Basic Operations}
+
+\begin{equation}
+  \texttt{Add}(x, y) = x + y,
+  \quad \pdv{\texttt{Add}}{x} = 1,
+  \quad \pdv{\texttt{Add}}{y} = 1
+\end{equation}
+\begin{equation}
+  \texttt{Mul}(x, y) = x \times y,
+  \quad \pdv{\texttt{Mul}}{x} = y,
+  \quad \pdv{\texttt{Mul}}{y} = x
+\end{equation}
+\begin{equation}
+  \texttt{Pow}(x, y) = x^y,
+  \quad \pdv{\texttt{Pow}}{x} = yx^{y-1},
+  \quad \pdv{\texttt{Pow}}{y} = x^y \log x
+\end{equation}
+\begin{equation}
+  \texttt{Log}(x) = \log x,
+  \quad \pdv{\texttt{Log}}{x} = x^{-1},
+\end{equation}
+\begin{equation}
+  \texttt{ReLU}(x) = \max(x, 0),
+  \quad \pdv{\texttt{ReLU}}{x} = yx^{y-1},
+\end{equation}
+\begin{equation}
+  \texttt{Sum}(x, \texttt{axis}) = \sum_{i \in \texttt{axis}} x_i,
+  \quad \pdv{\texttt{Sum}}{x} = 1,
+\end{equation}
+\begin{equation}
+  \texttt{MatMul}(x, y) = xy,
+  \quad \pdv{\texttt{MatMul}}{x} = y,
+  \quad \pdv{\texttt{MatMul}}{y} = x
+\end{equation}
+
+\subsection{Classification}
+
+Following \cite{accurate-softmax}, we use a shifted softmax for numerical stability:
+\[
+  \texttt{Softmax}(x_j) = \frac{\exp{(x_j - s)}}{\sum_i{\exp{(x_i - s)}}}
+\]
+
+The negative log-likelihood loss (with log-probability input)
+\[
+  \texttt{NLLLoss}(\log\hat{y}, y) = -y \log \hat{y}
+\]
+
+The cross-entropy loss (with logit inputs) can be seen as a combination of \texttt{Softmax} and \texttt{NLLLoss}.
+
+
+
+\subsection{Matrix Multiplication}
+
+
+\subsection{Cross Entropy Loss}
+
+
+
+\section{MNIST Classification}
+
+Utilizing the operators described in \autoref{sec:autodiff},
+we perform testing on the MNIST dataset.
+
+
+\printbibliography
+
+\end{document}
