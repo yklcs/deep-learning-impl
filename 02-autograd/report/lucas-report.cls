@@ -26,20 +26,25 @@
 \RequirePackage{datetime2}
 \RequirePackage{tikz}
 \RequirePackage{eso-pic}
-\RequirePackage{tabularx}
 \RequirePackage{wrapfig}
 \RequirePackage{fancyvrb}
 \RequirePackage{enumitem}
 % \RequirePackage{lmodern}
 \RequirePackage{siunitx}
-\RequirePackage[backend=biber,sorting=none]{biblatex}
+\RequirePackage[
+  backend=biber,
+  sorting=none,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false,
+]{biblatex}
 \RequirePackage{caption}
 \RequirePackage{titling}
 \RequirePackage{setspace}
 \RequirePackage{subcaption}
 \RequirePackage{tabularray}
-
-\UseTblrLibrary{booktabs}
+\RequirePackage{bm}
 
 \geometry{
   a4paper,
@@ -53,30 +58,32 @@
 }
 
 %%% Titling
-\setlength{\droptitle}{-3em}
+\setlength{\droptitle}{-1.75cm}
 
-\pretitle{
-  \begin{flushleft}\LARGE\bfseries
-    }
-    \posttitle{
-  \end{flushleft}
+% tex-fmt: off
+\pretitle{%
+  \begin{flushleft}\LARGE\bfseries%
+}
+\posttitle{%
+  \end{flushleft}%
 }
 
-\preauthor{
-  \begin{flushleft}
-    \large
-    \onehalfspacing
-    }
-    \postauthor{
-  \end{flushleft}
+\preauthor{%
+  \begin{flushleft}%
+    \large%
+    \onehalfspacing%
+}
+\postauthor{%
+  \end{flushleft}%
 }
 
-\predate{
-  \begin{flushleft}
-    }
-    \postdate{
-  \end{flushleft}
+\predate{%
+  \begin{flushleft}%
 }
+\postdate{%
+  \end{flushleft}%
+}
+% tex-fmt: on
 
 % \makeatletter
 % \renewcommand{\maketitle}{\bgroup\setlength{\parindent}{0pt}
@@ -115,7 +122,7 @@
 \makeatother
 
 \algnewcommand{\IfThenElse}[3]{% \IfThenElse{<if>}{<then>}{<else>}
-  \State \algorithmicif\ #1\ \algorithmicthen\ #2\ \algorithmicelse\ #3}
+\State \algorithmicif\ #1\ \algorithmicthen\ #2\ \algorithmicelse\ #3}
 
 %%% Margin note style
 
@@ -149,6 +156,8 @@
 \newcommand*\nan{\textsc{NaN}\xspace}
 \NewDocumentCommand{\inc}{ s m }{\IfBooleanTF{#1}{\mathrel{++}\!#2}{#2\!\mathrel{++}}}
 \NewDocumentCommand{\dec}{ s m }{\IfBooleanTF{#1}{\mathrel{--}\!#2}{#2\!\mathrel{--}}}
+\NewDocumentCommand{\Ell}{}{\ensuremath{\mathcal{L}}}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 
 %%% Colors
 
@@ -163,7 +172,10 @@
 
 %%% Vectors and Matrices
 
-\DeclareDocumentCommand\vb{ m }{ \mathbf{#1} } % Vector bold [star for Greek and italic Roman]
-
+\NewDocumentCommand{\vb}{ m }{ \mathbf{#1} }
 
 \letdif{\grad}{nabla}
+
+%%% Tables
+
+\UseTblrLibrary{booktabs}

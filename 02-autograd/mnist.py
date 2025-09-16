@@ -4,7 +4,7 @@ from pprint import pprint
 from urllib.request import urlretrieve
 
 import numpy as np
-from autograd import Log, NLLLoss, ReLU, Softmax, Sum, Tensor
+from autograd import CrossEntropyLoss, ReLU, Sum, Tensor
 
 
 def load_mnist(path=None):
@@ -105,10 +105,12 @@ def run_mnist(
 
             # Forward pass:
             logits = model(X_batch)
-            probs = Softmax.apply(logits)
-            logp = Log.apply(probs)
-            loss = NLLLoss.apply(logp, y_batch) + loss_l2
-            # loss = CrossEntropyLoss.apply(logits, y_batch) + loss_l2  # Compute cross-entropy loss over the batch
+            # probs = Softmax.apply(logits)
+            # logp = Log.apply(probs)
+            # loss = NLLLoss.apply(logp, y_batch) + loss_l2
+            loss = (
+                CrossEntropyLoss.apply(logits, y_batch) + loss_l2
+            )  # Compute cross-entropy loss over the batch
             total_loss += float(loss.data)
 
             # Backward pass:
@@ -131,11 +133,8 @@ def run_mnist(
     return acc
 
 
-def main():
-    l2_weights = [0, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2]
-    runs = 10
+def test_l2_weights(l2_weights, runs):
     results = {}
-
     for l2_weight in l2_weights:
         accs = []
         for _ in range(runs):
@@ -154,5 +153,8 @@ def main():
 
     pprint(results)
 
+    return results
 
-main()
+
+if __name__ == "__main__":
+    test_l2_weights([0, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1], 50)
