@@ -2,7 +2,16 @@
 
 \title{CSED490F Lab: Autograd}
 \author{Team 4: Yunkyu Lee (20210733), Hyeonu Cho (20230740)}
-\date{September 16, 2025}
+\date{Compiled \DTMNow}
+
+\setlength{\droptitle}{-2cm}
+\geometry{
+  a4paper,
+  left=2.5cm,
+  top=2.5cm,
+  bottom=2.75cm,
+  right=2.5cm,
+}
 
 \NewDocumentCommand{\jacobian}{}{\ensuremath{\text{J}}}
 
@@ -27,9 +36,9 @@ back-to-front accumulation of local gradients based on the chain rule.
 % we can chain the above VJP in order to obtain gradients of composed functions.
 % Therefore, knowing the local gradients of function outputs w.r.t. their inputs
 % is sufficient for reverse-mode automatic differentiation.
-
+%
 % \subsection{Basic Operations}
-
+%
 We omit the definitions and the local gradients of the
 \texttt{Add}, \texttt{Mul}, \texttt{Pow}, \texttt{Log}, and \texttt{Sum} operations as they are trivial,
 and show \texttt{ReLU} as an example.
@@ -68,7 +77,6 @@ and show \texttt{ReLU} as an example.
 
 \subsection{Matrix Multiplication}
 
-We define \(\texttt{MatMul}\) as the matrix multiplication operator.
 Let $z = \texttt{MatMul}(x, y)$ for \(x \in \mathbb{R}^{N \times D}\) and \(y \in \mathbb{R}^{D \times M}\).
 Then, each element of \(z \in \mathbb{R}^{N \times M}\) is computed as \(z_{n,m} = \sum_d x_{n,d}\,y_{d,m}\).
 Any element \(x_{n,m}\) of \(x\) only contributes to row $n$ of \(z\):
@@ -118,14 +126,15 @@ By simple differentiation, we can obtain \(\pdv{\texttt{Softmax}(x)_i}/{x_j}\) f
 % \]
 
 Using the above gradients, we can derive a backpropagation rule in matrix form:
-\[
-  \begin{aligned}
+{
+  \allowdisplaybreaks
+  \begin{align*}
     \pdv{\Ell}{x_j} & = \sum_i \pdv{\Ell}{\texttt{Softmax}(x)_i} \pdv{\texttt{Softmax}(x)_i}{x_j} \\
     & = \pdv{\Ell}{\texttt{Softmax}(x)_j} \bigl( \texttt{Softmax}(x)_j - \texttt{Softmax}(x)_j^2 \bigr)
     - \sum_{i \neq j } \pdv{\Ell}{\texttt{Softmax}(x)_i} \texttt{Softmax}(x)_i \texttt{Softmax}(x)_j \\
     & = \texttt{Softmax}(x)_j \left( \pdv{\Ell}{\texttt{Softmax}(x)_j} - \sum_i \pdv{\Ell}{\texttt{Softmax}(x)_i}\texttt{Softmax}(x)_i \right)
-  \end{aligned}
-\]
+  \end{align*}
+}
 
 \textbf{Negative log-likelihood.} The negative log-likelihood loss (with log-probability input) is defined as the following,
 with trivial local gradients:
@@ -150,11 +159,11 @@ The local gradients can be found accordingly by the chain rule on \texttt{Log}, 
 \section{MNIST Classification}
 
 Utilizing the operators described in \autoref{sec:autodiff},
-we train an MLP $f_\theta$ to perform classification on the MNIST dataset.
+we train an MLP $f_\theta$ to perform classification on the MNIST dataset \cite{mnist}.
 The MLP architecture used is shown below.
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.7\textwidth]{model.pdf}
+  \includegraphics[width=0.6\textwidth]{model.pdf}
 \end{figure}
 
 The cross-entropy loss is used with L2 regularization.
@@ -168,14 +177,8 @@ so the fused \texttt{CrossEntropyLoss} operator was used directly.
     \mathcal{L}_\text{L2}(\theta) &= \sum_{W \in \theta} \norm{W}_2^2 \\
   \end{aligned}
 \]
-
-% TODO - include a abstract image of mlp or a few lines of description about the model
-% How about the MLP code?
-
 The model is trained for 10 epochs with a batch size of 100 and a learning rate of 0.1 via SGD.
 We report our results on varying $\lambda_\text{L2}$ values below, taking the mean of 50 runs for each setting.
-
-% TODO - include the result image, acc and loss
 \begin{table}[h]
   \centering
   \begin{tblr}{colspec={r *{7}c}}\toprule
@@ -184,6 +187,7 @@ We report our results on varying $\lambda_\text{L2}$ values below, taking the me
     \bottomrule
   \end{tblr}
 \end{table}
+
 We conclude that L2 regularization is not necessary in this problem.
 While $\lambda_\text{L2} = 10^{-6}$ did give the best results,
 the improvements were marginal and could be attributed to stochasticity.
