@@ -1,0 +1,15 @@
+logs/*
+
+reports/*
+
+dataset/*
+
+runs/*
+
+*/__pycache__/*
+
+nsight_logs/*
+
+old*
+
+*TA_run*
