@@ -19,9 +19,15 @@
 # Set your name and home path
 # For REPO_DIR, we recommend you to use same name as origin git repository name,
 # but you can freely use new REPO name and revise repository path.
-YOUR_NAME="your_name" # ex: honggildong
-YOUR_HOME_PATH="your_home_path" # ex: /home/honggildong
-REPO_DIR=CSED490F_DDP_DALI_Training
+
+set -a
+source "$(dirname -- $0)/.env"
+set +a
+
+echo $YOUR_NAME
+echo $YOUR_HOME_PATH
+echo $REPO_DIR
+
 DATASET_DIR="/home/dataset"
 
 DIRECTORY_PATH=${YOUR_HOME_PATH}/${REPO_DIR}
