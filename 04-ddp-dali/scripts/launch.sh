@@ -14,7 +14,9 @@ export NUM_GPUS
 ###########################################################################
 
 # Scaffold
-CUDA_VISIBLE_DEVICES=$LOCAL_GPU_IDS python train_cifar.py \
+CUDA_VISIBLE_DEVICES=$LOCAL_GPU_IDS \
+nsys profile -o "$NSIGHT_LOG_DIR/$NSIGHT_FILE_NAME" \
+python train_cifar.py \
     --num_gpu=$NUM_GPUS \
     --data="$DATA_DIR" \
     --ckpt="$CKPT_DIR" \
