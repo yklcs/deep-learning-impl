@@ -21,7 +21,7 @@
 # but you can freely use new REPO name and revise repository path.
 
 set -a
-source "$(dirname -- $0)/.env"
+source ".env"
 set +a
 
 echo $YOUR_NAME

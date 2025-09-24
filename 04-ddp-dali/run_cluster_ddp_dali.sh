@@ -24,7 +24,7 @@
 # REPO_DIR="deep-learning-impl/04-ddp-dali"
 
 set -a
-source "$(dirname -- $0)/.env"
+source ".env"
 set +a
 
 echo $YOUR_NAME
