@@ -21,7 +21,7 @@
 # but you can freely use new REPO name and revise repository path.
 
 set -a
-source ".env"
+source "$SLURM_SUBMIT_DIR/.env"
 set +a
 
 echo $YOUR_NAME

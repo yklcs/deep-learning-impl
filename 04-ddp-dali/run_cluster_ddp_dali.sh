@@ -24,7 +24,7 @@
 # REPO_DIR="deep-learning-impl/04-ddp-dali"
 
 set -a
-source ".env"
+source "$SLURM_SUBMIT_DIR/.env"
 set +a
 
 echo $YOUR_NAME
