@@ -116,11 +116,10 @@ def get_DDP_loader(
     if train_batch > 0:
         if cutout > 0:
             transform_train.transforms.append(Cutout(cutout))
-        sampler = DistributedSampler(train_dataset)
+        sampler = DistributedSampler(train_dataset, shuffle=shuffle)
         train_loader = torch.utils.data.DataLoader(
             train_dataset,
             batch_size=train_batch,
-            shuffle=shuffle,
             num_workers=num_workers,
             pin_memory=True,
             drop_last=False,
@@ -133,11 +132,10 @@ def get_DDP_loader(
         assert valid_batch > 0, (
             "validation set follows the batch size of test set, which is 0"
         )
-        sampler = DistributedSampler(valid_dataset)
+        sampler = DistributedSampler(valid_dataset, shuffle=False)
         valid_loader = torch.utils.data.DataLoader(
             valid_dataset,
             batch_size=valid_batch,
-            shuffle=False,
             num_workers=num_workers,
             pin_memory=True,
             drop_last=False,
@@ -147,11 +145,10 @@ def get_DDP_loader(
         valid_loader = None
 
     if test_batch > 0:
-        sampler = DistributedSampler(test_dataset)
+        sampler = DistributedSampler(test_dataset, shuffle=False)
         test_loader = torch.utils.data.DataLoader(
             test_dataset,
             batch_size=test_batch,
-            shuffle=False,
             num_workers=num_workers,
             pin_memory=True,
             drop_last=False,

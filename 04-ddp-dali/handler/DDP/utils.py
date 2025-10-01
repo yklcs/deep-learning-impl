@@ -17,7 +17,7 @@ def run_process(func, args):
     nprocs = args.num_gpu
     mp.spawn(  # type: ignore
         fn=func,
-        args=args,
+        args=(args,),
         nprocs=nprocs,
     )
 
@@ -37,6 +37,7 @@ def initialize_group(proc_id, host, port, num_gpu):
     dist.init_process_group(
         backend="nccl",
         init_method=dist_url,
+        rank=proc_id,
         world_size=num_gpu,
     )
     torch.cuda.set_device(proc_id % num_gpu)
