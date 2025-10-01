@@ -12,6 +12,7 @@ def model_to_DDP(model):
 
     rank = dist.get_rank()
     world_size = dist.get_world_size()
+    model = model.to(rank % world_size)
     model = DDP(model, device_ids=[rank % world_size])
 
     return model
