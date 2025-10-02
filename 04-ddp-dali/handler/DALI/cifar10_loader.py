@@ -138,7 +138,7 @@ class CifarPipeline(Pipeline):
             # 1. Padding
             images = fn.crop_mirror_normalize(
                 images,
-                crop=32,
+                crop=(32, 32),
                 dtype=types.FLOAT,
                 mirror=fn.random.coin_flip(),
                 mean=CIFAR_MEAN,
@@ -153,7 +153,7 @@ class CifarPipeline(Pipeline):
             # 1. Crop, Normalize
             images = fn.crop_mirror_normalize(
                 images,
-                crop=32,
+                crop=(32, 32),
                 dtype=types.FLOAT,
                 mirror=False,
                 mean=CIFAR_MEAN,
@@ -204,8 +204,8 @@ def get_DALI_loader(
             is_train=True,
             cutout_length=cutout,
             device_id=rank % world_size,
-            shard_id=rank % world_size,
-            num_shards=world_size,
+            shard_id=0,
+            num_shards=1,
             num_workers=num_workers,
         )
         pipe.build()
@@ -225,8 +225,8 @@ def get_DALI_loader(
             is_train=False,
             cutout_length=0,
             device_id=rank % world_size,
-            shard_id=rank % world_size,
-            num_shards=world_size,
+            shard_id=0,
+            num_shards=1,
             num_workers=num_workers,
         )
         pipe.build()
@@ -245,8 +245,8 @@ def get_DALI_loader(
             is_train=False,
             cutout_length=0,
             device_id=rank % world_size,
-            shard_id=rank % world_size,
-            num_shards=world_size,
+            shard_id=0,
+            num_shards=1,
             num_workers=num_workers,
         )
         pipe.build()
