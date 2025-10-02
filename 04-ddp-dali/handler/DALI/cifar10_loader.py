@@ -204,8 +204,8 @@ def get_DALI_loader(
             is_train=True,
             cutout_length=cutout,
             device_id=rank % world_size,
-            shard_id=0,
-            num_shards=1,
+            shard_id=rank % world_size,
+            num_shards=world_size,
             num_workers=num_workers,
         )
         pipe.build()
@@ -225,8 +225,8 @@ def get_DALI_loader(
             is_train=False,
             cutout_length=0,
             device_id=rank % world_size,
-            shard_id=0,
-            num_shards=1,
+            shard_id=rank % world_size,
+            num_shards=world_size,
             num_workers=num_workers,
         )
         pipe.build()
@@ -245,8 +245,8 @@ def get_DALI_loader(
             is_train=False,
             cutout_length=0,
             device_id=rank % world_size,
-            shard_id=0,
-            num_shards=1,
+            shard_id=rank % world_size,
+            num_shards=world_size,
             num_workers=num_workers,
         )
         pipe.build()
