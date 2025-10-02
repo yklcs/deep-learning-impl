@@ -18,7 +18,7 @@ CUDA_VISIBLE_DEVICES=$LOCAL_GPU_IDS \
 nsys profile -o "$NSIGHT_LOG_DIR/$NSIGHT_FILE_NAME" \
     --trace=cuda,nvtx,cublas,cudnn,osrt \
     --pytorch=autograd-nvtx \
-    --gpu-metrics-devices=cuda-visible \
+    --gpu-metrics-devices=$LOCAL_GPU_IDS \
 python train_cifar.py \
     --num_gpu=$NUM_GPUS \
     --data="$DATA_DIR" \
