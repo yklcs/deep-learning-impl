@@ -13,3 +13,5 @@ nsight_logs/*
 old*
 
 *TA_run*
+
+*.pdf
