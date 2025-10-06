@@ -119,7 +119,7 @@ def get_DDP_loader(
         sampler = DistributedSampler(train_dataset, shuffle=shuffle)
         train_loader = torch.utils.data.DataLoader(
             train_dataset,
-            batch_size=train_batch,
+            batch_size=train_batch // world_size,
             num_workers=num_workers,
             pin_memory=True,
             drop_last=False,
@@ -135,7 +135,7 @@ def get_DDP_loader(
         sampler = DistributedSampler(valid_dataset, shuffle=False)
         valid_loader = torch.utils.data.DataLoader(
             valid_dataset,
-            batch_size=valid_batch,
+            batch_size=valid_batch // world_size,
             num_workers=num_workers,
             pin_memory=True,
             drop_last=False,
@@ -148,7 +148,7 @@ def get_DDP_loader(
         sampler = DistributedSampler(test_dataset, shuffle=False)
         test_loader = torch.utils.data.DataLoader(
             test_dataset,
-            batch_size=test_batch,
+            batch_size=test_batch // world_size,
             num_workers=num_workers,
             pin_memory=True,
             drop_last=False,

@@ -200,7 +200,7 @@ def get_DALI_loader(
     if train_batch > 0:
         pipe = CifarPipeline(
             data_dir=train_dir,
-            batch_size=train_batch,
+            batch_size=train_batch // world_size,
             is_train=True,
             cutout_length=cutout,
             device_id=rank % world_size,
@@ -221,7 +221,7 @@ def get_DALI_loader(
         assert valid_batch > 0, "Validation batch size must be > 0"
         pipe = CifarPipeline(
             data_dir=valid_dir,
-            batch_size=valid_batch,
+            batch_size=valid_batch // world_size,
             is_train=False,
             cutout_length=0,
             device_id=rank % world_size,
@@ -241,7 +241,7 @@ def get_DALI_loader(
     if test_batch > 0:
         pipe = CifarPipeline(
             data_dir=test_dir,
-            batch_size=test_batch,
+            batch_size=test_batch // world_size,
             is_train=False,
             cutout_length=0,
             device_id=rank % world_size,
