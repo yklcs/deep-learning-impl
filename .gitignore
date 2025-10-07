@@ -14,3 +14,6 @@ wheels/
 # Nsight
 *.nsys-rep
 .env
+
+*.pdf
+*.zip
