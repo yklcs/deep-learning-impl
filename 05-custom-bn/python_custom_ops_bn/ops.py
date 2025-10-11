@@ -21,6 +21,26 @@ def batchnorm_forward(
     """forward pass of BatchNorm for 4D input [N, C, H, W]."""
 
     # Implement Here
+    # Ref. https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html
+    if training :
+        save_mean = input.mean(dim=(0, 2, 3), keepdim=True)
+        var = input.var(dim=(0, 2, 3), unbiased=False, keepdim=True)
+        # var = ((input - mean[None, :, None, None]) ** 2).mean(dim=(0, 2, 3), keepdim=True)
+
+        # In Pytorch, avg running values if momentum is None.
+        # Can we impl it? 
+
+        # Is this correct to handle mutated_args?
+        running_mean.mul_(1 - momentum).add_(momentum * save_mean.squeeze())
+        running_var.mul_(1 - momentum).add_(momentum * var.squeeze())
+    else :
+        save_mean = running_mean.clone().view(1, -1, 1, 1)
+        var = running_var.clone().view(1, -1, 1, 1)
+        save_invstd = 1 / torch.sqrt(var + eps)
+
+    save_invstd = 1 / torch.sqrt(var + eps)
+    norm_input = (input - save_mean) * save_invstd
+    output = gamma.view(1, -1, 1, 1) * norm_input + beta.view(1, -1, 1, 1)
 
     return output, save_mean, save_invstd
 
@@ -36,6 +56,12 @@ def batchnorm_backward(
     """backward pass of BatchNorm for 4D input."""
 
     # Implement Here
+    # Ref. https://arxiv.org/abs/1502.03167
+    norm_input = (input - save_mean.view(1, -1, 1, 1)) * save_invstd.view(1, -1, 1, 1)
+
+    grad_gamma = (grad_output * norm_input).sum(dim=(0, 2, 3))
+    grad_beta = grad_output.sum(dim=(0, 2, 3))
+    grad_input = gamma.view(1, -1, 1, 1) * save_invstd * (grad_output - grad_output.mean(dim=(0, 2, 3), keepdim=True) - norm_input * (grad_output * norm_input).mean(dim=(0, 2, 3), keepdim=True))
 
     return grad_input, grad_gamma, grad_beta
 
