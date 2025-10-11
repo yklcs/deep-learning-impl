@@ -25,14 +25,17 @@ def batchnorm_forward(
     if training :
         save_mean = input.mean(dim=(0, 2, 3), keepdim=True)
         var = input.var(dim=(0, 2, 3), unbiased=False, keepdim=True)
-        # var = ((input - mean[None, :, None, None]) ** 2).mean(dim=(0, 2, 3), keepdim=True)
+        # unbiased_var = input.var(dim=(0, 2, 3), unbiased=True, keepdim=True)
+        m = (lambda n, _, h, w: n * h * w)(*input.shape)
+        corrected_var = (m / (m - 1)) * var
+        # assert torch.allclose(corrected_var, unbiased_var)
 
         # In Pytorch, avg running values if momentum is None.
         # Can we impl it? 
 
         # Is this correct to handle mutated_args?
         running_mean.mul_(1 - momentum).add_(momentum * save_mean.squeeze())
-        running_var.mul_(1 - momentum).add_(momentum * var.squeeze())
+        running_var.mul_(1 - momentum).add_(momentum * corrected_var.squeeze())
     else :
         save_mean = running_mean.clone().view(1, -1, 1, 1)
         var = running_var.clone().view(1, -1, 1, 1)
