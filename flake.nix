@@ -25,6 +25,8 @@
           cmake
           openssl
           jq
+          texliveSmall
+          poppler-utils
         ]
         ++ (with cudaPackages_12_8; [
           cuda_cccl
