@@ -20,30 +20,26 @@ def batchnorm_forward(
 ) -> Tuple[Tensor, Tensor, Tensor]:
     """forward pass of BatchNorm for 4D input [N, C, H, W]."""
 
-    # Implement Here
+    n, _c, h, w = input.shape
+    reduce_dims = (0, 2, 3)
+    expand_shape = (1, -1, 1, 1)
+
     # Ref. https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html
-    if training :
-        save_mean = input.mean(dim=(0, 2, 3), keepdim=True)
-        var = input.var(dim=(0, 2, 3), unbiased=False, keepdim=True)
-        # unbiased_var = input.var(dim=(0, 2, 3), unbiased=True, keepdim=True)
-        m = (lambda n, _, h, w: n * h * w)(*input.shape)
-        corrected_var = (m / (m - 1)) * var
-        # assert torch.allclose(corrected_var, unbiased_var)
+    if training:
+        save_mean = input.mean(dim=reduce_dims)
+        var = input.var(dim=reduce_dims, unbiased=False)
+        m = n * h * w
+        var_unbiased = (m / (m - 1)) * var
 
-        # In Pytorch, avg running values if momentum is None.
-        # Can we impl it? 
+        running_mean[:] = (1 - momentum) * running_mean + momentum * save_mean
+        running_var[:] = (1 - momentum) * running_var + momentum * var_unbiased
+    else:
+        save_mean = running_mean.clone()
+        var = running_var.clone()
 
-        # Is this correct to handle mutated_args?
-        running_mean.mul_(1 - momentum).add_(momentum * save_mean.squeeze())
-        running_var.mul_(1 - momentum).add_(momentum * corrected_var.squeeze())
-    else :
-        save_mean = running_mean.clone().view(1, -1, 1, 1)
-        var = running_var.clone().view(1, -1, 1, 1)
-        save_invstd = 1 / torch.sqrt(var + eps)
-
-    save_invstd = 1 / torch.sqrt(var + eps)
-    norm_input = (input - save_mean) * save_invstd
-    output = gamma.view(1, -1, 1, 1) * norm_input + beta.view(1, -1, 1, 1)
+    save_invstd = torch.rsqrt(var + eps)
+    norm_input = (input - save_mean.view(expand_shape)) * save_invstd.view(expand_shape)
+    output = gamma.view(expand_shape) * norm_input + beta.view(expand_shape)
 
     return output, save_mean, save_invstd
 
@@ -60,11 +56,24 @@ def batchnorm_backward(
 
     # Implement Here
     # Ref. https://arxiv.org/abs/1502.03167
-    norm_input = (input - save_mean.view(1, -1, 1, 1)) * save_invstd.view(1, -1, 1, 1)
 
-    grad_gamma = (grad_output * norm_input).sum(dim=(0, 2, 3))
-    grad_beta = grad_output.sum(dim=(0, 2, 3))
-    grad_input = gamma.view(1, -1, 1, 1) * save_invstd * (grad_output - grad_output.mean(dim=(0, 2, 3), keepdim=True) - norm_input * (grad_output * norm_input).mean(dim=(0, 2, 3), keepdim=True))
+    reduce_dims = (0, 2, 3)
+    expand_shape = (1, -1, 1, 1)
+
+    norm_input = (input - save_mean.view(expand_shape)) * save_invstd.view(expand_shape)
+
+    grad_gamma = (grad_output * norm_input).sum(dim=reduce_dims)
+    grad_beta = grad_output.sum(dim=reduce_dims)
+    grad_input = (
+        gamma.view(expand_shape)
+        * save_invstd.view(expand_shape)
+        * (
+            grad_output
+            - grad_output.mean(dim=reduce_dims, keepdim=True)
+            - norm_input
+            * (grad_output * norm_input).mean(dim=reduce_dims, keepdim=True)
+        )
+    )
 
     return grad_input, grad_gamma, grad_beta
 
