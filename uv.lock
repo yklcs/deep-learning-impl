@@ -199,7 +199,7 @@ wheels = [
 [[package]]
 name = "custom-ops-bn"
 version = "0.0.1"
-source = { directory = "06-triton-bn" }
+source = { editable = "06-triton-bn" }
 dependencies = [
     { name = "torch" },
 ]
@@ -267,7 +267,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "custom-ops-bn", directory = "06-triton-bn" },
+    { name = "custom-ops-bn", editable = "06-triton-bn" },
     { name = "jax", specifier = ">=0.7.1" },
     { name = "matplotlib", specifier = ">=3.10.6" },
     { name = "numpy", specifier = ">=2.3.3" },

@@ -20,4 +20,4 @@ dev = ["ipykernel>=6.30.1"]
 cuda = ["nvidia-dali-cuda120>=1.51.2"]
 
 [tool.uv.sources]
-custom-ops-bn = { path = "06-triton-bn" }
+custom-ops-bn = { path = "06-triton-bn", editable = true }
