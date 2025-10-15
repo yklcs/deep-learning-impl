@@ -197,6 +197,17 @@ wheels = [
 ]
 
 [[package]]
+name = "custom-ops-bn"
+version = "0.0.1"
+source = { directory = "06-triton-bn" }
+dependencies = [
+    { name = "torch" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "torch", specifier = ">=2.0.0" }]
+
+[[package]]
 name = "cycler"
 version = "0.12.1"
 source = { registry = "https://pypi.org/simple" }
@@ -236,6 +247,7 @@ name = "dl-impl"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "custom-ops-bn" },
     { name = "jax" },
     { name = "matplotlib" },
     { name = "numpy" },
@@ -255,6 +267,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "custom-ops-bn", directory = "06-triton-bn" },
     { name = "jax", specifier = ">=0.7.1" },
     { name = "matplotlib", specifier = ">=3.10.6" },
     { name = "numpy", specifier = ">=2.3.3" },
