@@ -24,3 +24,6 @@ README.md
 .idea/
 *.swp
 *.swo
+
+*.png
+*.pdf
