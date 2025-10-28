@@ -41,6 +41,9 @@ def batchnorm_forward_training_kernel(
     BLOCK_SIZE: tl.constexpr,
 ):
     c = tl.program_id(0)  # One program per channel
+    if c >= C:
+        return
+    
     M = N * spatial_dim  # Number of all elements in channel (NHW)
 
     gamma = tl.load(gamma_ptr + c)
@@ -72,6 +75,7 @@ def batchnorm_forward_training_kernel(
         count = new_count
 
     variance = m2 / count
+    variance_unbiased = m2 / (count - 1)
     invstd = tl.math.rsqrt(variance + eps)
 
     # EMA updates
@@ -79,7 +83,7 @@ def batchnorm_forward_training_kernel(
     old_running_mean = tl.load(running_mean_ptr + c)
     old_running_var = tl.load(running_var_ptr + c)
     new_running_mean = (1.0 - momentum) * old_running_mean + momentum * mean
-    new_running_var = (1.0 - momentum) * old_running_var + momentum * variance
+    new_running_var = (1.0 - momentum) * old_running_var + momentum * variance_unbiased
     tl.store(running_mean_ptr + c, new_running_mean)
     tl.store(running_var_ptr + c, new_running_var)
 
@@ -125,6 +129,9 @@ def batchnorm_forward_inference_kernel(
     BLOCK_SIZE: tl.constexpr,
 ):
     c = tl.program_id(0)
+    if c >= C:
+        return
+    
     M = N * spatial_dim
 
     mean = tl.load(mean_ptr + c)
@@ -133,6 +140,8 @@ def batchnorm_forward_inference_kernel(
     beta = tl.load(beta_ptr + c)
 
     invstd = tl.math.rsqrt(variance + eps)
+    # It is useless.. but better than nothing!
+    tl.store(invstd_ptr + c, invstd)
 
     # Scale/shift and store
 
@@ -172,6 +181,9 @@ def batchnorm_backward_kernel(
     BLOCK_SIZE: tl.constexpr,
 ):
     c = tl.program_id(0)
+    if c >= C:
+        return
+    
     M = N * spatial_dim
 
     mean = tl.load(mean_ptr + c)
