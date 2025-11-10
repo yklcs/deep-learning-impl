@@ -1,7 +1,9 @@
 import time
 import torch
 from torchvision import models, transforms
-
+# ---------- Change Begin ----------
+import torch.autograd.profiler as profiler
+# ----------- Change End -----------
 torch.backends.quantized.engine = 'qnnpack'
 
 # create imageset 
@@ -20,18 +22,21 @@ net = torch.jit.script(net)
 started = time.time()
 last_logged = time.time()
 frame_count = 0
+# ---------- Change Begin ----------
+with profiler.profile(with_stack=True, profile_memory=True) as prof:
+    with torch.no_grad():        
+        for i in range(300):
+            # run model
+            output = net(imgs[i % 100])
 
-with torch.no_grad():        
-    for i in range(300):
-        # run model
-        output = net(imgs[i % 100])
+            # log model performance
+            frame_count += 1
+            now = time.time()
 
-        # log model performance
-        frame_count += 1
-        now = time.time()
+            if now - last_logged > 1:
+                print(f"{frame_count / (now-last_logged)} fps")
+                last_logged = now
+                frame_count = 0
 
-        if now - last_logged > 1:
-            print(f"{frame_count / (now-last_logged)} fps")
-            last_logged = now
-            frame_count = 0
-
+print(prof.key_averages(group_by_stack_n=10).table(sort_by='self_cpu_time_total', row_limit=5))
+# ----------- Change End -----------

@@ -33,7 +33,14 @@ onnx.checker.check_model(onnx_model)
 
 # load ONNX model 
 import onnxruntime
-ort_session = onnxruntime.InferenceSession("MV2.onnx", providers=["CPUExecutionProvider"])
+
+# ---------- Change Begin ----------
+# Profiling 
+sess_options = onnxruntime.SessionOptions()
+sess_options.enable_profiling = True
+
+ort_session = onnxruntime.InferenceSession("MV2.onnx", sess_options=sess_options, providers=["CPUExecutionProvider"])
+# ----------- Change End -----------
 
 def to_numpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
@@ -61,3 +68,7 @@ with torch.no_grad():
             last_logged = now
             frame_count = 0
 
+# ---------- Change Begin ----------
+prof_path = ort_session.end_profiling()
+print("ORT profile saved to:", prof_path)
+# ----------- Change End -----------
