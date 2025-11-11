@@ -48,16 +48,36 @@ def main():
         sys.exit(1)
     
     
-    server = f"http://{args.host}:{args.port}/api/chat"
+    server = f"http://{args.host}:{args.port}/api"
     history = []
+    currnent_model = args.model
     while True:
         prompt = input(">>> ")
 
         if prompt[0] == '/':
-            pass
+            if prompt.split()[0] == '/load':
+                payload = {
+                    "model": prompt.split()[1]
+                }
+                with requests.post(f"{server}/generate", json=payload) as response:
+                    response.raise_for_status()
+                    print(response.json())
+                    currnent_model = response.json()['model']
+            elif prompt.split()[0] == '/unload':
+                payload = {
+                    "model": currnent_model,
+                    "keep_alive" :0
+                }
+                with requests.post(f"{server}/generate", json=payload) as response:
+                    response.raise_for_status()
+                    print(response.json())
+            elif prompt.split()[0] == '/exit':
+                print("Exiting...")
+                break
+
         else:
             print()
-            response = request(server, args.stream, history, prompt, args.model)
+            response = request(f"{server}/chat", args.stream, history, prompt, currnent_model)
             print()
 
 if __name__ == "__main__":
