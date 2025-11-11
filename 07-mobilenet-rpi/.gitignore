@@ -1,2 +1,3 @@
 onnxruntime_profile_*.json
 *.onnx
+*.json

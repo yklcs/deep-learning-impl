@@ -13,7 +13,6 @@ from hailo_platform import (
     OutputVStreamParams,
     OutputVStreams,
     VDevice,
-    __version__,
 )
 
 
