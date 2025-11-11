@@ -5,20 +5,23 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "hailort",
     "matplotlib>=3.10.6",
     "numpy>=1,<2",
-    "onnx>=1.19.0",
-    "onnxruntime>=1.23.2",
     "seaborn>=0.13.2",
-    "torch>=2.8.0",
-    "torchvision>=0.23.0",
+    "torch~=2.4.1",
+    "torchvision~=0.19.1",
+    "torch>=2.4.1",
     "tqdm>=4.67.1",
 ]
 
 [dependency-groups]
 dev = ["ipykernel>=6.30.1"]
 cuda = ["nvidia-dali-cuda120>=1.51.2", "custom-ops-bn"]
+hailo = [
+    "hailort",
+    "onnx~=1.17.0",
+    "onnxruntime~=1.23.2",
+]
 
 [tool.uv.sources]
 custom-ops-bn = { path = "06-triton-bn", editable = true }
