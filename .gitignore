@@ -17,3 +17,6 @@ wheels/
 
 *.pdf
 *.zip
+
+# Hailo
+*.log

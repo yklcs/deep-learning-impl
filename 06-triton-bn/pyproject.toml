@@ -1,3 +1,7 @@
+[project]
+name = "custom-ops-bn"
+version = "0.1.0"
+
 [build-system]
 requires = [
     "setuptools>=42",
