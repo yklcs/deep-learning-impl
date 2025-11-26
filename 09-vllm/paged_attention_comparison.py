@@ -1,29 +1,37 @@
 import time
+
 import torch
 from vllm import LLM, SamplingParams
 
 # ============================================
 # Experiments Configure
 # ============================================
-MODEL_NAME = "NousResearch/Llama-2-7b-hf"       # Llama-2 open model
+# MODEL_NAME = "NousResearch/Llama-2-7b-hf"  # Llama-2 open model
 # MODEL_NAME = "NousResearch/Meta-Llama-3-8B"            # Llama-3 open model
+MODEL_NAME = "Qwen/Qwen2.5-0.5B"
 
 PROMPT = "Explain the concept of attention mechanism in transformers."
 
 SAMPLING_PARAMS = SamplingParams(temperature=0.7, max_tokens=256)
 GPU_MEMORY_UTILIZATION = 0.8
 
+
 def run_inference(use_paged_attention: bool, batch_size: int):
     """
-        PagedAttention ON: block size 16
-        PagedAttention OFF simulated : block size 2048
+    PagedAttention ON: block size 16
+    PagedAttention OFF simulated : block size 2048
     """
 
     block_size = 16 if use_paged_attention else 2048
 
     # Model load
     start = time.time()
-    llm = LLM(model=MODEL_NAME, dtype=torch.float16, gpu_memory_utilization=GPU_MEMORY_UTILIZATION, block_size=block_size)
+    llm = LLM(
+        model=MODEL_NAME,
+        dtype=torch.float16,
+        gpu_memory_utilization=GPU_MEMORY_UTILIZATION,
+        block_size=block_size,
+    )
     load_time = time.time() - start
     print(f"Model load time: {load_time:.2f}s")
 
@@ -46,12 +54,12 @@ def run_inference(use_paged_attention: bool, batch_size: int):
     return infer_time, throughput
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # ============================================
     # Run
     # ============================================
     results = []
-    for batch_size in [8]:
+    for batch_size in [8, 32, 128, 512, 2048, 8192]:
         for paged in [True, False]:
             res = run_inference(use_paged_attention=paged, batch_size=batch_size)
             results.append((paged, batch_size, *res))
